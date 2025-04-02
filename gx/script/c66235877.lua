@@ -1,0 +1,39 @@
+--デス・デーモン・ドラゴン
+--Fiend Skull Dragon
+function c66235877.initial_effect(c)
+	--fusion material
+	c:EnableReviveLimit()
+	aux.AddFusionProcCode2(c,false,false,93220472,16475472)
+	--Negate FLIP monster
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_DISABLE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_FLIP))
+	c:RegisterEffect(e1)
+	--Negate flip effects
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_CHAIN_SOLVING)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetOperation(c66235877.disop)
+	c:RegisterEffect(e2)
+	--Summoner of Illusions interaction
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(c66235877)
+	e3:SetRange(LOCATION_MZONE)
+	c:RegisterEffect(e3)
+	aux.DoubleSnareValc66235877ity(c,LOCATION_MZONE)
+end
+c66235877.material_setcode=0x45
+function c66235877.disop(e,tp,eg,ep,ev,re,r,rp)
+	if re:IsActiveType(TYPE_FLIP) then Duel.NegateEffect(ev) end
+	if re:IsActiveType(TYPE_TRAP) and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
+		local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
+		if g and g:IsContains(e:GetHandler()) then
+			Duel.NegateEffect(ev)
+		end
+	end
+end
