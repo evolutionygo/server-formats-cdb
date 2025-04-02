@@ -1,0 +1,34 @@
+--リターンソウル
+function c10537981.initial_effect(c)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_TODECK)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_END_PHASE)
+	e1:SetCondition(c10537981.condition)
+	e1:SetTarget(c10537981.target)
+	e1:SetOperation(c10537981.activate)
+	c:RegisterEffect(e1)
+end
+function c10537981.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_END
+end
+function c10537981.filter(c,tc10537981)
+	return c:IsReason(REASON_DESTROY) and c:IsMonster() and c:GetTurnID()==tc10537981
+		and c:IsAbleToDeck()
+end
+function c10537981.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c10537981.filter(chkc,Duel.GetTurnCount()) end
+	if chk==0 then return Duel.IsExistingTarget(c10537981.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,Duel.GetTurnCount()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,c10537981.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,3,nil,Duel.GetTurnCount())
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
+end
+function c10537981.activate(e,tp,eg,ep,ev,re,r,rp)
+	local sg=Duel.GetTargetCards(e)
+	if #sg>0 then
+		Duel.SendtoDeck(sg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	end
+end

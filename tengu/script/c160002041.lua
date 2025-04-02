@@ -1,0 +1,29 @@
+--黒・魔・導
+--Dark Magic Attack (Rush)
+function c160002041.initial_effect(c)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c160002041.condition)
+	e1:SetTarget(c160002041.target)
+	e1:SetOperation(c160002041.activate)
+	c:RegisterEffect(e1)
+end
+c160002041.listed_names={CARD_DARK_MAGICIAN}
+function c160002041.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_DARK_MAGICIAN),tp,LOCATION_ONFIELD,0,1,nil)
+end
+function c160002041.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,1,c) end
+	local sg=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,c)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,#sg,tp,0)
+end
+function c160002041.activate(e,tp,eg,ep,ev,re,r,rp)
+	local sg=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,e:GetHandler())
+	if sg and #sg>0 then
+		Duel.Destroy(sg,REASON_EFFECT)
+	end
+end

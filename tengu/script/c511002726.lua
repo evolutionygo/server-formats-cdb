@@ -1,0 +1,66 @@
+--BF－隠れ蓑のスチーム (Anime)
+--Blackwing - Steam the Cloaked (Anime)
+Duel.EnableUnofficialProc(PROC_STATS_CHANGED)
+function c511002726.initial_effect(c)
+	--token
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringc511002726(c511002726,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_LEAVE_FIELD)
+	e1:SetCondition(c511002726.tkcon)
+	e1:SetTarget(c511002726.tktg)
+	e1:SetOperation(c511002726.tkop)
+	c:RegisterEffect(e1)
+end
+function c511002726.tkcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsPreviousPosition(POS_FACEUP) and c:GetLocation()~=LOCATION_DECK
+end
+function c511002726.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,9047461,0,TYPES_TOKEN,100,100,3,RACE_AQUA,ATTRIBUTE_WIND) end
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
+end
+function c511002726.tkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,9047461,0,TYPES_TOKEN,100,100,3,RACE_AQUA,ATTRIBUTE_WIND) then
+		local token=Duel.CreateToken(tp,9047461)
+		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetOperation(c511002726.desop)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+		e1:SetCountLimit(1)
+		token:RegisterEffect(e1)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+		e3:SetRange(LOCATION_MZONE)
+		e3:SetCode(511009110)
+		e3:SetCondition(c511002726.atkcon)
+		e3:SetOperation(c511002726.atkop)
+		e3:SetReset(RESET_EVENT|RESETS_STANDARD)
+		token:RegisterEffect(e3)
+	end
+end
+function c511002726.desop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+end
+function c511002726.cfilter(c,tp)
+	local val=0
+	if c:GetFlagEffect(284)>0 then val=c:GetFlagEffectLabel(284) end
+	return c:IsControler(1-tp) and val>0 and c:GetAttack()<=0
+end
+function c511002726.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c511002726.cfilter,1,nil,tp)
+end
+function c511002726.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local g=eg:Filter(c511002726.cfilter,nil,tp)
+	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+end

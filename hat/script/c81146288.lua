@@ -1,0 +1,86 @@
+--大凛魔天使ローザリアン
+--Rosaria, the Stately Fallen Angel
+function c81146288.initial_effect(c)
+	c:EnableReviveLimit()
+	--Special Summon procedure
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCondition(c81146288.spcon)
+	e1:SetTarget(c81146288.sptg)
+	e1:SetOperation(c81146288.spop)
+	c:RegisterEffect(e1)
+	--Negate the effect of all cards currently on the field
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringc81146288(c81146288,0))
+	e2:SetCategory(CATEGORY_DISABLE)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetTarget(c81146288.distg)
+	e2:SetOperation(c81146288.disop)
+	c:RegisterEffect(e2)
+end
+function c81146288.rescon(sg,e,tp,mg)
+	return sg:IsExists(Card.IsLocation,1,nil,LOCATION_HAND)
+		and (sg:IsExists(Card.IsLocation,1,nil,LOCATION_GRAVE) or (sg:IsExists(aux.SpElimFilter,1,nil,true)))
+end
+function c81146288.spfilter(c,tp)
+	return c:IsLevelAbove(7) and c:IsRace(RACE_PLANT) and c:IsAbleToRemoveAsCost()
+		and (c:IsLocation(LOCATION_HAND) or (aux.SpElimFilter(c,true) and Duel.GetMZoneCount(tp,c)>0))
+end
+function c81146288.spcon(e,c)
+	if c==nil then return true end
+	local tp=e:GetHandlerPlayer()
+	local rg=Duel.GetMatchingGroup(c81146288.spfilter,tp,LOCATION_HAND,0,e:GetHandler(),tp)
+	local rg2=Duel.GetMatchingGroup(c81146288.spfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,nil,tp)
+	rg:Merge(rg2)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and #rg>0 and #rg2>0
+		and aux.SelectUnselectGroup(rg,e,tp,2,2,c81146288.rescon,0)
+end
+function c81146288.sptg(e,tp,eg,ep,ev,re,r,rp,c)
+	local rg=Duel.GetMatchingGroup(c81146288.spfilter,tp,LOCATION_HAND|LOCATION_MZONE|LOCATION_GRAVE,0,e:GetHandler(),tp)
+	local g=aux.SelectUnselectGroup(rg,e,tp,2,2,c81146288.rescon,1,tp,HINTMSG_REMOVE,nil,nil,true)
+	if #g>0 then
+		g:KeepAlive()
+		e:SetLabelObject(g)
+		return true
+	end
+	return false
+end
+function c81146288.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=e:GetLabelObject()
+	if not g then return end
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	g:DeleteGroup()
+end
+function c81146288.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
+end
+function c81146288.disop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local g=Duel.GetMatchingGroup(Card.IsNegatable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,c)
+	if #g==0 then return end
+	for tc in g:Iter() do
+		--Negate effects
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESETS_STANDARD_PHASE_END)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetReset(RESETS_STANDARD_PHASE_END)
+		tc:RegisterEffect(e2)
+		if tc:IsType(TYPE_TRAPMONSTER) then
+			local e3=Effect.CreateEffect(c)
+			e3:SetType(EFFECT_TYPE_SINGLE)
+			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+			e3:SetReset(RESETS_STANDARD_PHASE_END)
+			tc:RegisterEffect(e3)
+		end
+	end
+end

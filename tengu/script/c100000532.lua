@@ -1,0 +1,66 @@
+--Ｗａｌｋｕｒｅｎ Ｒｉｔｔ
+--Rc100000532e of the Valkyries
+function c100000532.initial_effect(c)
+	--special summon
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(c100000532.target)
+	e1:SetOperation(c100000532.operation)
+	c:RegisterEffect(e1)
+end
+c100000532.listed_series={0x122}
+function c100000532.filter(c)
+	return c:IsSetCard(0x122) and c:IsMonster()
+end
+function c100000532.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetMatchingGroup(c100000532.filter,tp,LOCATION_HAND,0,nil)
+	local ct=#g
+	if chk==0 then return ct>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=ct
+		and (ct==1 or not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) 
+		and g:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,0,tp,false,false)==ct end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,ct,tp,LOCATION_HAND)
+end
+function c100000532.operation(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(c100000532.filter,tp,LOCATION_HAND,0,nil,e,tp)
+	local ct=#g
+	if ct<=0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<ct or (ct>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) 
+		or g:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,0,tp,false,false)~=ct then return end
+	local c=e:GetHandler()
+	local fc100000532=c:GetFieldID()
+	g:ForEach(function(tc)
+		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(c100000532,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fc100000532)
+	end)
+	Duel.SpecialSummonComplete()
+	g:KeepAlive()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetCountLimit(1)
+	e1:SetLabel(fc100000532)
+	e1:SetLabelObject(g)
+	e1:SetCondition(c100000532.retcon)
+	e1:SetOperation(c100000532.retop)
+	Duel.RegisterEffect(e1,tp)
+end
+function c100000532.retfilter(c,fc100000532)
+	return c:GetFlagEffectLabel(c100000532)==fc100000532
+end
+function c100000532.retcon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c100000532.retfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+		return false
+	else return true end
+end
+function c100000532.retop(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	local tg=g:Filter(c100000532.retfilter,nil,e:GetLabel())
+	g:DeleteGroup()
+	Duel.SendtoDeck(tg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+end

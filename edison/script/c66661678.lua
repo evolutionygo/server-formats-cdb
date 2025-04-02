@@ -1,0 +1,40 @@
+--氷結界のロイヤル・ナイト
+--Royal Knight of the Ice Barrier
+function c66661678.initial_effect(c)
+	--Special summon 1 token to opponent's field
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringc66661678(c66661678,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCondition(c66661678.condition)
+	e1:SetTarget(c66661678.target)
+	e1:SetOperation(c66661678.operation)
+	c:RegisterEffect(e1)
+end
+c66661678.listed_names={66661679}
+function c66661678.condition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_TRIBUTE)
+end
+function c66661678.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,tp,0)
+end
+function c66661678.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,c66661678+1,0,TYPES_TOKEN,1000,0,1,RACE_AQUA,ATTRIBUTE_WATER,POS_FACEUP_ATTACK,1-tp) then
+		local token=Duel.CreateToken(tp,c66661678+1)
+		Duel.SpecialSummonStep(token,0,tp,1-tp,false,false,POS_FACEUP_ATTACK)
+		--Cannot be tributed for a tribute summon
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(3304)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UNRELEASABLE_SUM)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetValue(1)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		token:RegisterEffect(e1,true)
+		Duel.SpecialSummonComplete()
+	end
+end

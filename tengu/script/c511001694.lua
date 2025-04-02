@@ -1,0 +1,50 @@
+--花札衛－桐に鳳凰－ (Anime)
+--Flower Cardian Paulownia with Phoenix (Anime)
+function c511001694.initial_effect(c)
+	c:EnableUnsummonable()
+	--spsummon
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringc511001694(c511001694,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCost(c511001694.spcost)
+	e1:SetTarget(c511001694.sptg)
+	e1:SetOperation(c511001694.spop)
+	c:RegisterEffect(e1,false,REGISTER_FLAG_CARDIAN)
+end
+c511001694.listed_series={SET_FLOWER_CARDIAN}
+function c511001694.filter(c)
+    local re=c:GetReasonEffect()
+    return c:IsLevel(12) and c:IsSetCard(SET_FLOWER_CARDIAN) and (not c:IsSummonType(SUMMON_TYPE_SPECIAL)
+        or (not re or not re:GetHandler():IsSetCard(SET_FLOWER_CARDIAN) or not re:GetHandler():IsMonster()))
+end
+function c511001694.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+    if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511001694.filter,1,false,aux.ReleaseCheckMMZ,nil) end
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+    local g=Duel.SelectReleaseGroupCost(tp,c511001694.filter,1,1,false,aux.ReleaseCheckMMZ,nil)
+    Duel.Release(g,REASON_COST)
+end
+function c511001694.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,true,false) and Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function c511001694.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)>0 then
+		local g=Duel.GetDecktopGroup(tp,1)
+		local tc=g:GetFirst()
+		Duel.Draw(tp,1,REASON_EFFECT)
+		if tc then
+			Duel.ConfirmCards(1-tp,tc)
+			if Cardian.CheckSpCondition(tc) then
+				Duel.ShuffleHand(tp)
+			else
+				Duel.SendtoGrave(tc,REASON_EFFECT)
+			end
+		end
+	end
+end

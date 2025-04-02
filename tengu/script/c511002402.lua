@@ -1,0 +1,73 @@
+--レプティア・エッグ (Manga)
+--Reptia Egg (Manga)
+function c511002402.initial_effect(c)
+	--Register
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE_START+PHASE_STANDBY)
+	e1:SetCountLimit(1)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c511002402.regcon)
+	e1:SetOperation(c511002402.regop)
+	c:RegisterEffect(e1)
+	--Special Summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e2:SetCountLimit(1)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(c511002402.spcon)
+	e2:SetCost(c511002402.spcost)
+	e2:SetOperation(c511002402.spop)
+	c:RegisterEffect(e2)
+	--Pyro Clock of Destiny
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetCode(1082946)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetOperation(c511002402.resetop)
+	c:RegisterEffect(e3)
+end
+c511002402.listed_series={0x508}
+function c511002402.regcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsTurnPlayer(tp) and Duel.GetTurnCount()~=e:GetHandler():GetTurnID()
+end
+function c511002402.regop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(c511002402,RESET_EVENT+RESETS_STANDARD,0,1)
+end
+function c511002402.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetFlagEffect(c511002402)==2
+end
+function c511002402.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsReleasable() end
+	Duel.Release(e:GetHandler(),REASON_COST)
+end
+function c511002402.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
+	if chk==0 then return ft>0
+		and Duel.IsExistingMatchingCard(c511002402.filter,tp,0x13,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0x13)
+end
+function c511002402.filter(c,e,tp)
+	return c:IsRace(RACE_REPTILE) and c:IsSetCard(0x508) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function c511002402.spop(e,tp,eg,ep,ev,re,r,rp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft<=0 then return end
+	if ft>3 then ft=3 end
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c511002402.filter),tp,0x13,0,1,ft,nil,e,tp)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+function c511002402.resetop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	c:RegisterFlagEffect(c511002402,RESET_EVENT+RESETS_STANDARD,0,0)
+	local ct=c:GetFlagEffect(c511002402)
+	c:SetTurnCounter(ct)
+end

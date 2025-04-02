@@ -1,0 +1,52 @@
+--傷炎星－ウルブショウ
+--Brotherhood of the Fire Fist - Wolf
+function c93294869.initial_effect(c)
+	--set
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringc93294869(c93294869,0))
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCode(EVENT_FLIP)
+	e1:SetTarget(c93294869.settg)
+	e1:SetOperation(c93294869.setop)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	e2:SetOperation(c93294869.flipop)
+	c:RegisterEffect(e2)
+end
+c93294869.listed_series={0x7c}
+function c93294869.filter1(c)
+	return c:IsSetCard(0x7c) and c:IsTrap() and c:IsSSetable()
+end
+function c93294869.filter2(c)
+	return c:IsSetCard(0x7c) and c:IsSpell() and c:IsSSetable()
+end
+function c93294869.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c93294869.filter1,tp,LOCATION_DECK,0,1,nil) end
+	if e:GetHandler():GetFlagEffect(c93294869)~=0 then
+		e:SetLabel(1)
+		e:GetHandler():ResetFlagEffect(c93294869)
+	else
+		e:SetLabel(0)
+	end
+end
+function c93294869.setop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+	local g=Duel.SelectMatchingCard(tp,c93294869.filter1,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		Duel.SSet(tp,g)
+		local sg=Duel.GetMatchingGroup(c93294869.filter2,tp,LOCATION_DECK,0,nil)
+		if e:GetLabel()==1 and #sg>0 and Duel.SelectYesNo(tp,aux.Stringc93294869(c93294869,1)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+			local tg=sg:Select(tp,1,1,nil)
+			Duel.SSet(tp,tg)
+		end
+	end
+end
+function c93294869.flipop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(c93294869,0,0,0)
+end
