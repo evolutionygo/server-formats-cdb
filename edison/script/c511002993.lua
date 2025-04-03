@@ -5,7 +5,7 @@ function c511002993.initial_effect(c)
 	c:EnableReviveLimit()
 	--to hand
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringc511002993(50321796,0))
+	e1:SetDescription(aux.Stringid(511002993,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
