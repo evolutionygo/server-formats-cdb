@@ -2,7 +2,7 @@
 function c511002992.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringc511002992(14878871,0))
+	e1:SetDescription(aux.Stringid(511002992,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -29,29 +29,29 @@ function c511002992.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=1 then return end
 	local g=Duel.GetMatchingGroup(c511002992.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if #g>=2 then
-		local fc511002992=e:GetHandler():GetFieldID()
+		local fid=e:GetHandler():GetFieldID()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,2,2,nil)
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		local tc=sg:GetFirst()
-		tc:RegisterFlagEffect(51102992,RESET_EVENT+RESETS_STANDARD,0,1,fc511002992)
+		tc:RegisterFlagEffect(51102992,RESET_EVENT+RESETS_STANDARD,0,1,fid)
 		tc=sg:GetNext()
-		tc:RegisterFlagEffect(51102992,RESET_EVENT+RESETS_STANDARD,0,1,fc511002992)
+		tc:RegisterFlagEffect(51102992,RESET_EVENT+RESETS_STANDARD,0,1,fid)
 		sg:KeepAlive()
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetCountLimit(1)
-		e1:SetLabel(fc511002992)
+		e1:SetLabel(fid)
 		e1:SetLabelObject(sg)
 		e1:SetCondition(c511002992.descon)
 		e1:SetOperation(c511002992.desop)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
-function c511002992.desfilter(c,fc511002992)
-	return c:GetFlagEffectLabel(51102992)==fc511002992
+function c511002992.desfilter(c,fid)
+	return c:GetFlagEffectLabel(51102992)==fid
 end
 function c511002992.descon(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
