@@ -1,7 +1,7 @@
 --氷結界の龍 ブリューナク
 function c511002993.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,nil,1,1,aux.NonTuner(nil),1,99)
+	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1,99)
 	c:EnableReviveLimit()
 	--to hand
 	local e1=Effect.CreateEffect(c)
