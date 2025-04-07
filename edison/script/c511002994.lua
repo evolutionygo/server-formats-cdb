@@ -9,7 +9,7 @@ function c511002994.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCondition(c511002994.spcon)
+	e1:SetCondition(aux.bdogcon) -- 🔁 ESTA es la clave
 	e1:SetTarget(c511002994.sptg)
 	e1:SetOperation(c511002994.spop)
 	c:RegisterEffect(e1)
