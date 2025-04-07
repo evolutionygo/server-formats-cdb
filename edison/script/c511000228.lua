@@ -13,13 +13,13 @@ function c511000228.initial_effect(c)
 	e1:SetOperation(c511000228.operation)
 	c:RegisterEffect(e1)
 end
-function c511000228.cfilter(c)
+function c511000228.filter(c)
 	return c:GetAttack()>0
 end
 function c511000228.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511000228.cfilter,1,false,nil,nil) end
-	local sg=Duel.SelectReleaseGroupCost(tp,c511000228.cfilter,1,1,false,nil,nil)
-	e:SetLabel(sg:GetFirst():GetAttack()/2)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c511000228.filter,1,nil) end
+	local sg=Duel.SelectReleaseGroup(tp,c511000228.filter,1,1,nil)
+	e:SetLabel(math.floor(sg:GetFirst():GetAttack()/2))
 	Duel.Release(sg,REASON_COST)
 end
 function c511000228.target(e,tp,eg,ep,ev,re,r,rp,chk)
