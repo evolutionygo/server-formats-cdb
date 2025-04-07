@@ -14,9 +14,11 @@ function c511000228.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c511000228.cfilter(c)
+	Debug.Message("Entró en COST1")
 	return c:GetAttack()>0
 end
 function c511000228.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	Debug.Message("Entró en COST")
 	if chk==0 then return Duel.CheckReleaseGroupCost(tp,c511000228.cfilter,1,false,nil,nil) end
 	local sg=Duel.SelectReleaseGroupCost(tp,c511000228.cfilter,1,1,false,nil,nil)
 	e:SetLabel(sg:GetFirst():GetAttack()/2)
