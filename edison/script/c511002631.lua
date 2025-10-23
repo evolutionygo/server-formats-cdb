@@ -2,7 +2,7 @@
 function c511002631.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringc511002631(26202165,0))
+	e1:SetDescription(aux.Stringid(511002631,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
@@ -19,12 +19,12 @@ function c511002631.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c511002631.filter(c)
-	return c:IsAttackBelow(1500) and c:IsMonster() and c:IsAbleToHand()
+	return c:IsAttackBelow(1500) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c511002631.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c511002631.filter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
+	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end

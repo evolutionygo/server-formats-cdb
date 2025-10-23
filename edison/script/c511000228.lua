@@ -3,7 +3,7 @@
 function c511000228.initial_effect(c)
 	--Tribute 1 monster to inflict damage equal to half of its ATK
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(c511000228,0))
+	e1:SetDescription(aux.Stringid(511000228,0))
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
